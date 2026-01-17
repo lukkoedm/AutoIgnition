@@ -1,0 +1,15 @@
+{
+    "Group": "Lutia",
+    "Name": "AutoIgnition",
+    "Version": "1.0.0",
+    "Description": "Automatically activates furnaces and campfires when fuel and input items are placed inside.",
+    "Authors": [
+        {
+            "Name": "Lutia"
+        }
+    ],
+    "Main": "com.lutia.autoignition.AutoIgnitionPlugin",
+    "DisabledByDefault": false,
+    "ServerVersion": "*",
+    "IncludesAssetPack": false
+}
