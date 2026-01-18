@@ -19,9 +19,7 @@ public class AutoIgnitionPlugin extends JavaPlugin {
     }
 
     @Override
-    protected void setup() {
-        super.start();
-
+    protected void start() {
         @SuppressWarnings("removal")
         ComponentType<ChunkStore, ProcessingBenchState> benchType =
                 BlockStateModule.get().getComponentType(ProcessingBenchState.class);

@@ -1,13 +1,15 @@
 {
     "Group": "Lutia",
     "Name": "AutoIgnition",
-    "Version": "1.0.0",
-    "Description": "Automatically activates furnaces and campfires when fuel and input items are placed inside.",
+    "Version": "1.0.1",
+    "Description": "Automatically activates benches when fuel and input items are placed inside.",
     "Authors": [
         {
-            "Name": "Lutia"
+            "Name": "Lutia",
+            "Email": "lukkoedm@gmail.com"
         }
     ],
+    "Website": "https://www.curseforge.com/hytale/mods/autoignition",
     "Main": "com.lutia.autoignition.AutoIgnitionPlugin",
     "DisabledByDefault": false,
     "ServerVersion": "*",

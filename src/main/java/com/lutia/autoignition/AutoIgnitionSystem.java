@@ -25,16 +25,6 @@ public class AutoIgnitionSystem extends EntityTickingSystem<ChunkStore> {
 
         if (bench == null || bench.isActive()) return;
 
-        @SuppressWarnings("removal")
-        BlockType blockType = bench.getBlockType();
-
-        if (blockType == null || blockType.getId() == null) return;
-
-        String id = blockType.getId().toLowerCase();
-        boolean isTargetBench = id.contains("furnace") || id.contains("campfire");
-
-        if (!isTargetBench) return;
-
         if (bench.getRecipe() != null) {
             bench.setActive(true);
         }
