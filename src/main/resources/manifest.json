@@ -1,8 +1,8 @@
 {
     "Group": "Lutia",
     "Name": "AutoIgnition",
-    "Version": "1.0.1",
-    "Description": "Automatically activates benches when fuel and input items are placed inside.",
+    "Version": "2.0.0",
+    "Description": "Automatically activates benches when fuel and input items are placed inside, and transfers items to and from nearby chests.",
     "Authors": [
         {
             "Name": "Lutia",
