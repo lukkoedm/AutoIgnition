@@ -1,6 +1,7 @@
 package com.lutia.autoignition.logic;
 
 import com.hypixel.hytale.builtin.crafting.state.ProcessingBenchState;
+import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
@@ -113,12 +114,16 @@ public class BenchItemsTransferManager {
 
     private List<ItemContainer> findAdjacentContainers(ProcessingBenchState bench) {
         List<ItemContainer> containers = new ArrayList<>();
+
         @SuppressWarnings("removal")
-        World world = bench.getChunk().getWorld();
+        var benchChunk = bench.getChunk();
+        if (benchChunk == null) return containers;
+
+        World world = benchChunk.getWorld();
+        if (world == null) return containers;
+
         @SuppressWarnings("removal")
         Vector3i startPos = bench.getBlockPosition();
-
-        if (world == null) return containers;
 
         BlockType sourceBlockType = world.getBlockType(startPos.x, startPos.y, startPos.z);
         String sourceId = (sourceBlockType != null) ? sourceBlockType.getId() : "unknown";
@@ -140,25 +145,37 @@ public class BenchItemsTransferManager {
                 Vector3i neighborPos = new Vector3i(current.x + offset[0], current.y + offset[1], current.z + offset[2]);
 
                 if (visited.contains(neighborPos)) continue;
+                visited.add(neighborPos);
 
-                @SuppressWarnings({"removal", "deprecation"})
-                BlockState neighborState = world.getState(neighborPos.x, neighborPos.y, neighborPos.z, true);
+                long chunkIndex = ChunkUtil.indexChunkFromBlock(neighborPos.x, neighborPos.z);
 
-                if (neighborState == null) {
-                    visited.add(neighborPos);
-                    continue;
+                if (chunkIndex != benchChunk.getIndex()) {
+                    if (world.getChunkStore().getChunkReference(chunkIndex) == null) {
+                        continue;
+                    }
                 }
 
-                BlockType neighborType = world.getBlockType(neighborPos.x, neighborPos.y, neighborPos.z);
+                try {
+                    @SuppressWarnings({"removal", "deprecation"})
+                    BlockState neighborState = world.getState(neighborPos.x, neighborPos.y, neighborPos.z, true);
 
-                if (neighborState instanceof ItemContainerState) {
-                    visited.add(neighborPos);
-                    containers.add(((ItemContainerState) neighborState).getItemContainer());
-                } else if (neighborType != null && neighborType.getId().equals(sourceId)) {
-                    visited.add(neighborPos);
-                    queue.add(neighborPos);
-                } else {
-                    visited.add(neighborPos);
+                    if (neighborState == null) continue;
+
+                    if (neighborState instanceof ItemContainerState) {
+                        containers.add(((ItemContainerState) neighborState).getItemContainer());
+                    } else {
+                        BlockType neighborType = world.getBlockType(neighborPos.x, neighborPos.y, neighborPos.z);
+                        if (neighborType != null && neighborType.getId().equals(sourceId)) {
+                            queue.add(neighborPos);
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    String msg = e.getMessage();
+                    if (msg != null && (msg.contains("Store is currently processing") || msg.contains("Chunk failure backoff"))) {
+                        LOGGER.at(Level.FINER).log("Skipped neighbor check at " + neighborPos + " due to chunk state.");
+                    } else {
+                        LOGGER.at(Level.WARNING).withCause(e).log("Unexpected error checking neighbor at " + neighborPos);
+                    }
                 }
             }
         }
